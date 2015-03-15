@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+
+    <title></title>
+</head>
+<body>
+<div class="box box-primary" id = "user_settings">
+    <div class="box-header">
+        <h3 class="box-title">Edit User Details</h3>
+    </div><!-- /.box-header -->
+    <!-- form start -->
+    <form role="form" action="#" th:action="@{/labtwo/users/update}" th:object="${updateUser}" method="post">
+        <div class="box-body">
+            <div class="form-group">
+                <label>User Id</label>
+                <p><input type="text" id="userid" name="userid" class="form-control" th:value="${getUser.userid}" disabled="disabled"/></p>
+                <label>Email address</label>
+                <p><input type="text" id="email" name="email" class="form-control" th:value="${getUser.email}"/></p>
+                <label>Password</label>
+                <p><input type="password" id="password" name="password" class="form-control" th:value="${getUser.password}"/></p>
+                <label>First Name</label>
+                <p><input type="text" id="firstname" name="firstname" class="form-control" th:value="${getUser.firstname}"/></p>
+                <label>Last Name</label>
+                <p><input type="text" id="lastname" name="last" class="form-control" th:value="${getUser.lastname}"/></p>
+                <label>Address</label>
+                <p><input type="text" id="address" name="address" class="form-control" th:value="${getUser.address}"/></p>
+                <label>Organization</label>
+                <p><input type="text" id="organization" name="organization" class="form-control" th:value="${getUser.organization}"/></p>
+                <label>About Yourself</label>
+                <p><input type="text" id="aboutyourself" name="aboutyourself" class="form-control" th:value="${getUser.aboutyourself}"/></p>
+            </div>
+        </div><!-- /.box-body -->
+        <div class="box-footer">
+            <button type="submit">Update</button>
+            <button type="submit">Delete</button>
+        </div>
+        </form>
+    </div>
+</body>
+</html>
