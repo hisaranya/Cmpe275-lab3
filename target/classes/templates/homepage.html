@@ -6,9 +6,13 @@
 </head>
 <body>
 <div class="box box-primary" id="user_settings" th:if="${brief} == off">
+    <div th:if="${badinput} == true">
+        <h3>Oops! Bad input!</h3>
+    </div>
     <div th:if="${update}== true">
         <h3>Update Success!</h3>
     </div>
+
     <div class="box-header">
         <h3 class="box-title">Edit User Details</h3>
     </div>
@@ -20,8 +24,7 @@
                 <label>User Id</label>
 
                 <p><input type="text" id="userid" name="userid" class="form-control" th:value="${javahomepage.userid}"
-                          disabled="readonly"/></p>
-                <p><input type="hidden" id="useridhidden" name="userid" class="form-control" th:value="${javahomepage.userid}"/></p>
+                          readonly="1"/></p>
                 <label>Email address</label>
 
                 <p><input type="text" id="email" name="email" class="form-control" th:value="${javahomepage.email}"/></p>

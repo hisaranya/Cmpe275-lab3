@@ -25,7 +25,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/labtwo")
 public class Application {
-
+    IHomePageDB homePageDB = new HomePageDB();
     public static void main(String[] args) {
         //setupDummyUser();
         SpringApplication.run(Application.class, args);
@@ -36,13 +36,13 @@ public class Application {
         hp.setFirstname("M");
         hp.setLastname("D");
         hp.setEmail("m@d.com");
+        hp.setUserid("1");
         hp.setPassword("S");
         hp.setAddress("SJ");
-        hp.setUserid("1");
         hp.setOrganization("SJSU");
         hp.setAboutyourself("Hi!");
-
-        HomePageCollection.getHomePageList().put(hp.userid, hp);
+        HomePageCollection.getHomePageList().put("1", hp);
+        HomePageCollection.getEmailList().add("m@d.com");
     }
 
     @RequestMapping(value="/homepage", method= RequestMethod.GET)
@@ -53,14 +53,15 @@ public class Application {
 
     @RequestMapping(value="/users", method=RequestMethod.POST)
     public String createUser(@Valid @ModelAttribute HomePage homePage, Model model) throws UnknownHostException {
-        System.out.println(homePage.userid+" "+homePage.email);
-        homePage = HomePage.createNewHomepageWithNewUserId(homePage);
-        model.addAttribute("createuser", homePage);
-        String userEmail = homePage.getEmail();
-        HomePageCollection.getHomePageList().put(homePage.userid, homePage);
-        model.addAttribute("getuserid", homePage.userid);
-        model.addAttribute("regsuc", true);
-        return "login";
+        try {
+            homePage = homePageDB.createNewHomepage(homePage);
+            model.addAttribute("getuserid", homePage.userid);
+            model.addAttribute("regsuc", true);
+            return "login";
+        } catch (EmailPresentException epe) {
+            return "userexists";
+        }
+
     }
 
     @RequestMapping(value="/users/login", method=RequestMethod.GET)
@@ -69,22 +70,19 @@ public class Application {
         model.addAttribute("regsuc", false);
         return "login";
     }
-
     @RequestMapping(value="/users/homepage", method=RequestMethod.GET)
     public String getHomePage(@RequestParam String user_id, @RequestParam String pwd, Model model, @RequestParam(required = false, defaultValue = "off") String brief) throws UnknownHostException {
-        if (HomePageCollection.getHomePageList().containsKey(user_id)) {
-            HomePage hp = HomePageCollection.getHomePageList().get(user_id);
-            if (hp.password.equals(pwd)) {
-                JSONObject myObject = pojoToJsonObject(hp);
-                model.addAttribute("javahomepage", hp);
-                model.addAttribute("jsonhomepage", myObject);
-                model.addAttribute("brief", brief);
-                model.addAttribute("update", false);
-                return "homepage";
-            } else {
-                return "invalidlogin";
-            }
-        } else {
+        try {
+            HomePage homePage = homePageDB.getHomepage(user_id, pwd);
+            JSONObject hpObject = pojoToJsonObject(homePage);
+            model.addAttribute("javahomepage", homePage);
+            model.addAttribute("jsonhomepage", hpObject);
+            model.addAttribute("brief", brief);
+            model.addAttribute("update", false);
+            return "homepage";
+        } catch (InvalidInputException iie) {
+            return "invalidlogin";
+        } catch (IdNotFoundException infe) {
             model.addAttribute("inputuserid", user_id);
             return "nosuchuserexists";
         }
@@ -92,21 +90,45 @@ public class Application {
 
     @RequestMapping(value="/users/update", method=RequestMethod.POST)
     public String updateFromHomePage(@Valid @ModelAttribute HomePage homePage, Model model) throws UnknownHostException {
-        HomePageCollection.getHomePageList().put(homePage.userid, homePage);
-        model.addAttribute("javahomepage", homePage);
-        String brief = "off";
-        model.addAttribute("brief", brief);
-        model.addAttribute("update", true);
-        return "homepage";
+        try {
+            homePageDB.updateHomepage(homePage);
+            model.addAttribute("javahomepage", homePage);
+            String brief = "off";
+            model.addAttribute("brief", brief);
+            model.addAttribute("update", true);
+            model.addAttribute("badinput", false);
+            return "homepage";
+        } catch (EmailPresentException epe) {
+            model.addAttribute("update", false);
+            String brief = "off";
+            model.addAttribute("brief", brief);
+            model.addAttribute("javahomepage", HomePageCollection.getHomePageList().get(homePage.userid));
+            model.addAttribute("badinput", true);
+            return "homepage";
+        } catch (IdNotFoundException infe) {
+            model.addAttribute("update", false);
+            String brief = "off";
+            model.addAttribute("brief", brief);
+            model.addAttribute("javahomepage", HomePageCollection.getHomePageList().get(homePage.userid));
+            model.addAttribute("badinput", true);
+            return "homepage";
+        }
+
     }
 
     @RequestMapping(value="/users/delete", method=RequestMethod.POST)
     public String deleteHomePage(@RequestParam String userid, Model model) throws UnknownHostException {
-        System.out.println("/"+userid+"/");
-        HomePageCollection.getHomePageList().remove(userid);
-        model.addAttribute("delete", true);
-        model.addAttribute("createuser", new HomePage());
-        return "register";
+        try {
+            homePageDB.deleteHomepage(userid);
+            model.addAttribute("delete", true);
+            model.addAttribute("createuser", new HomePage());
+            return "register";
+        } catch (IdNotFoundException infe) {
+            model.addAttribute("update", false);
+            model.addAttribute("javahomepage", HomePageCollection.getHomePageList().get(userid));
+            model.addAttribute("badinput", true);
+            return "homepage";
+        }
     }
 
     private JSONObject pojoToJsonObject(HomePage u) {
