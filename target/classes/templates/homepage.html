@@ -20,7 +20,8 @@
                 <label>User Id</label>
 
                 <p><input type="text" id="userid" name="userid" class="form-control" th:value="${javahomepage.userid}"
-                          readonly="1"/></p>
+                          disabled="readonly"/></p>
+                <p><input type="hidden" id="useridhidden" name="userid" class="form-control" th:value="${javahomepage.userid}"/></p>
                 <label>Email address</label>
 
                 <p><input type="text" id="email" name="email" class="form-control" th:value="${javahomepage.email}"/></p>

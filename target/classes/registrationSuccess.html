@@ -20,14 +20,12 @@
     </script>
 </head>
 <body>
-<div th:if="${regsuc} == true">
-    <p>Registration Success!</p>
-    <span>You user id is</span>
-    <span th:text="${getuserid}"></span>
-</div>
+<p>Registration Success!</p>
+<span>You user id is</span>
+<span th:text="${getuserid}"></span>
 <div class="form-box" id="login-box">
     <div class="header">Sign In with your user id and password</div>
-    <form action="#" name="myForm" th:action="@{/labtwo/users/homepage}" method="get">
+    <form action="#" name="myForm" onsubmit="return validateForm()" th:action="@{/labtwo/users/homepage}" method="get">
         <div class="body bg-gray">
             <div class="form-group">
                 <input type="text" name="user_id" class="form-control" placeholder="User Id"/>
@@ -36,14 +34,15 @@
                 <input type="password" name="pwd" class="form-control" placeholder="Password"/>
             </div>
             <div class="form-group">
-                <input type="checkbox" name="brief" class="form-control"/>Brief
+                <input type="hidden" name="brief" value="off" />
+                <input type="checkbox" name="brief" class="form-control" />Brief
             </div>
         </div>
-        <div class="footer">
-            <button type="submit">Sign Me In</button>
-            <a href="/labtwo/homepage" class="text-center">Register a new membership</a>
-        </div>
+            <div class="footer">
+                <button type="submit">Sign Me In</button>
+                <a href="/labtwo/register" class="text-center">Register a new membership</a>
+            </div>
     </form>
-</div>
+    </div>
 </body>
 </html>
